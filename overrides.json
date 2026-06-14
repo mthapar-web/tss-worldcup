@@ -3,6 +3,17 @@
   "boot": null,
   "eliminated": [],
   "thirds": [],
-  "standings": {}
+  "standings": {
+    "A": {"Mexico":1,"Korea Republic":2,"South Africa":3,"Czechia":4},
+    "B": {"Canada":1,"Bosnia-Herzegovina":2,"Qatar":3,"Switzerland":4},
+    "C": {"Brazil":1,"Morocco":2,"Scotland":3,"Haiti":4},
+    "D": {"USA":1,"Australia":2,"Paraguay":3,"Türkiye":4},
+    "E": {},
+    "F": {},
+    "G": {},
+    "H": {},
+    "I": {},
+    "J": {},
+    "K": {}
+  }
 }
-
