@@ -163,6 +163,10 @@
 </main>
 
 <script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let results = null;
+let overrides = null;
+
 // ─── PLAYER PICKS (embedded from Jotform CSV) ────────────────────────────────
 const PLAYERS = [
   { bracket:"Pardesia ye sachh hai piya", name:"Mayank Thapar", champion:"USA", boot:"Kylian Mbappe",
@@ -425,6 +429,22 @@ function renderAll() {
   renderLeaderboard();
   renderScores();
   renderInsights();
+}
+
+// ─── FETCH DATA ──────────────────────────────────────────────────────────────
+async function fetchData() {
+  try {
+    const [r, o] = await Promise.all([
+      fetch('results.json?v=' + Date.now()).then(x => x.json()),
+      fetch('overrides.json?v=' + Date.now()).then(x => x.json()).catch(() => ({}))
+    ]);
+    results = r; overrides = o;
+  } catch(e) {
+    results = { groups:{}, stats:{}, thirds:[], champion:null, boot:null };
+    overrides = {};
+  }
+  document.getElementById('lastUpdate').textContent = 'updated ' + new Date().toLocaleTimeString();
+  renderAll();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
