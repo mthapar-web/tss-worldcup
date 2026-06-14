@@ -1,12 +1,12 @@
 // update-scores.mjs
-// Pulls group-stage data from ESPN's public fifa.world feed,
+// Pulls match results from ESPN's public scoreboard feed,
 // computes group tables with FIFA tiebreakers,
 // works out the 8 best third-place qualifiers once all groups are final,
 // merges overrides.json, and writes results.json.
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 
-const ESPN_URL = 'https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings';
+const ESPN_SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=200';
 
 const GROUP_TEAMS = {
   A: ['Mexico','South Africa','Korea Republic','Czechia'],
@@ -26,112 +26,157 @@ const GROUP_TEAMS = {
 const NAME_MAP = {
   'United States': 'USA',
   'South Korea': 'Korea Republic',
-  'Bosnia & Herz.': 'Bosnia-Herzegovina',
-  'Ivory Coast': 'Ivory Coast',
+  "Korea Republic": 'Korea Republic',
+  'Bosnia & Herzegovina': 'Bosnia-Herzegovina',
+  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  "Côte d'Ivoire": 'Ivory Coast',
   "Cote d'Ivoire": 'Ivory Coast',
   'Turkey': 'Türkiye',
-  'Turkey (Türkiye)': 'Türkiye',
+  'Cape Verde': 'Cape Verde',
   'Cape Verde Islands': 'Cape Verde',
+  'Democratic Republic of Congo': 'DR Congo',
+  'Congo, DR': 'DR Congo',
   'DR Congo': 'DR Congo',
-  'Congo DR': 'DR Congo',
   'New Zealand': 'New Zealand',
+  'Curacao': 'Curaçao',
+  'Scotland': 'Scotland',
+  'Norway': 'Norway',
 };
 
-function normalizeName(n) {
-  return NAME_MAP[n] || n;
+function norm(n) { return NAME_MAP[n] || n; }
+
+// Build a lookup: team name -> which group
+const TEAM_TO_GROUP = {};
+for (const [grp, teams] of Object.entries(GROUP_TEAMS)) {
+  for (const t of teams) TEAM_TO_GROUP[t] = grp;
 }
 
-async function fetchStandings() {
+function initStats() {
+  return { w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0, gp:0 };
+}
+
+async function fetchScoreboard() {
   try {
-    const res = await fetch(ESPN_URL);
+    const res = await fetch(ESPN_SCOREBOARD);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return data;
+    return await res.json();
   } catch(e) {
     console.error('ESPN fetch failed:', e.message);
     return null;
   }
 }
 
-function parseGroups(data) {
-  const groups = {};
+function buildTables(data) {
+  // Initialize stats for all teams
   const stats = {};
+  for (const [grp, teams] of Object.entries(GROUP_TEAMS)) {
+    stats[grp] = {};
+    for (const t of teams) stats[grp][t] = initStats();
+  }
 
-  if (!data || !data.standings) return { groups, stats };
+  const events = data?.events || [];
+  let matchesProcessed = 0;
 
-  for (const grpData of (data.standings || [])) {
-    const grpName = grpData.name?.replace('Group ', '') || grpData.abbreviation;
-    if (!GROUP_TEAMS[grpName]) continue;
+  for (const event of events) {
+    // Only group stage matches
+    const roundName = event.season?.slug || event.competitions?.[0]?.type?.abbreviation || '';
+    const comp = event.competitions?.[0];
+    if (!comp) continue;
 
-    const entries = grpData.entries || grpData.standings?.entries || [];
-    const teamStats = {};
+    const status = comp.status?.type?.completed;
+    if (!status) continue; // skip unplayed/live matches
 
-    entries.forEach((entry, idx) => {
-      const teamName = normalizeName(entry.team?.displayName || entry.team?.name || '');
-      const s = entry.stats || [];
-      const getStat = (abbr) => {
-        const found = s.find(x => x.abbreviation === abbr || x.name === abbr);
-        return found ? parseInt(found.value ?? found.displayValue ?? 0) : 0;
-      };
-      teamStats[teamName] = {
-        pts: getStat('PTS') || getStat('points'),
-        gd: getStat('GD') || getStat('pointDifferential'),
-        gf: getStat('GF') || getStat('pointsFor'),
-        ga: getStat('GA') || getStat('pointsAgainst'),
-        w: getStat('W') || getStat('wins'),
-        d: getStat('T') || getStat('ties'),
-        l: getStat('L') || getStat('losses'),
-        gp: getStat('GP') || getStat('gamesPlayed'),
-        pos: idx + 1
-      };
-    });
+    const competitors = comp.competitors || [];
+    if (competitors.length !== 2) continue;
 
-    // Sort by pts desc, then GD desc, then GF desc
-    const sorted = Object.entries(teamStats).sort(([,a],[,b]) =>
-      b.pts - a.pts || b.gd - a.gd || b.gf - a.gf
-    );
+    const homeRaw = competitors.find(c => c.homeAway === 'home') || competitors[0];
+    const awayRaw = competitors.find(c => c.homeAway === 'away') || competitors[1];
 
+    const home = norm(homeRaw.team?.displayName || homeRaw.team?.name || '');
+    const away = norm(awayRaw.team?.displayName || awayRaw.team?.name || '');
+    const homeGrp = TEAM_TO_GROUP[home];
+    const awayGrp = TEAM_TO_GROUP[away];
+
+    if (!homeGrp || !awayGrp || homeGrp !== awayGrp) continue; // not a group match
+    const grp = homeGrp;
+
+    const hg = parseInt(homeRaw.score ?? 0);
+    const ag = parseInt(awayRaw.score ?? 0);
+
+    if (isNaN(hg) || isNaN(ag)) continue;
+
+    stats[grp][home].gp++;
+    stats[grp][away].gp++;
+    stats[grp][home].gf += hg;
+    stats[grp][home].ga += ag;
+    stats[grp][home].gd += (hg - ag);
+    stats[grp][away].gf += ag;
+    stats[grp][away].ga += hg;
+    stats[grp][away].gd += (ag - hg);
+
+    if (hg > ag) {
+      stats[grp][home].w++; stats[grp][home].pts += 3;
+      stats[grp][away].l++;
+    } else if (hg < ag) {
+      stats[grp][away].w++; stats[grp][away].pts += 3;
+      stats[grp][home].l++;
+    } else {
+      stats[grp][home].d++; stats[grp][home].pts++;
+      stats[grp][away].d++; stats[grp][away].pts++;
+    }
+    matchesProcessed++;
+  }
+
+  console.log(`Processed ${matchesProcessed} completed group matches`);
+
+  // Build position maps
+  const groups = {};
+  for (const [grp, teamStats] of Object.entries(stats)) {
+    const sorted = Object.entries(teamStats)
+      .sort(([,a],[,b]) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
     const posMap = {};
     sorted.forEach(([team], idx) => { posMap[team] = idx + 1; });
-    groups[grpName] = posMap;
-    stats[grpName] = teamStats;
+    groups[grp] = posMap;
   }
 
   return { groups, stats };
 }
 
 function findThirds(stats) {
-  // Collect all 3rd-place teams across groups
   const thirds = [];
   for (const [grp, teamStats] of Object.entries(stats)) {
-    const sorted = Object.entries(teamStats).sort(([,a],[,b]) =>
-      b.pts - a.pts || b.gd - a.gd || b.gf - a.gf
-    );
+    const sorted = Object.entries(teamStats)
+      .sort(([,a],[,b]) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
     if (sorted.length >= 3) {
       const [team, s] = sorted[2];
-      thirds.push({ team, grp, ...s });
+      // Only include if they've played all 3 group games
+      if (s.gp >= 3) thirds.push({ team, grp, ...s });
     }
   }
-  // Sort by points, then GD, then GF to find best 8
   thirds.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
   return thirds.slice(0, 8).map(t => t.team);
 }
 
 async function main() {
-  // Load overrides
   let overrides = {};
   if (existsSync('overrides.json')) {
     try { overrides = JSON.parse(readFileSync('overrides.json', 'utf8')); } catch(e) {}
   }
 
-  // Load existing results as fallback
-  let existing = { groups:{}, stats:{}, thirds:[], champion:null, boot:null, updatedAt:null };
+  let existing = { groups:{}, stats:{}, thirds:[], champion:null, boot:null };
   if (existsSync('results.json')) {
     try { existing = JSON.parse(readFileSync('results.json', 'utf8')); } catch(e) {}
   }
 
-  const espnData = await fetchStandings();
-  let { groups, stats } = espnData ? parseGroups(espnData) : { groups: existing.groups || {}, stats: existing.stats || {} };
+  const espnData = await fetchScoreboard();
+  let groups, stats;
+
+  if (espnData) {
+    ({ groups, stats } = buildTables(espnData));
+  } else {
+    groups = existing.groups || {};
+    stats = existing.stats || {};
+  }
 
   // Apply standings overrides
   if (overrides.standings) {
@@ -140,10 +185,9 @@ async function main() {
     }
   }
 
-  // Find 8 best thirds (or use override)
-  const thirds = (overrides.thirds && overrides.thirds.length)
+  const thirds = (overrides.thirds?.length)
     ? overrides.thirds
-    : (Object.keys(stats).length >= 11 ? findThirds(stats) : existing.thirds || []);
+    : findThirds(stats);
 
   const out = {
     groups,
