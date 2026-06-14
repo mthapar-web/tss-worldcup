@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSS World Cup 2026 — League Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #131929;
+    --border: #1e2d4a;
+    --accent: #3b7dd8;
+    --gold: #f5c518;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+    --green: #22c55e;
+    --red: #ef4444;
+    --muted: #6b7280;
+    --text: #e2e8f0;
+    --subtext: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  header { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); border-bottom: 1px solid var(--border); padding: 20px 24px; }
+  .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
+  header h1 span { color: var(--accent); }
+  .phase-badge { background: var(--accent); color: #fff; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px; }
+  .last-update { color: var(--subtext); font-size: 0.78rem; }
+
+  nav { background: var(--card); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 0; }
+  .nav-btn { background: none; border: none; color: var(--subtext); padding: 14px 20px; cursor: pointer; font-size: 0.88rem; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+  .scoring-strip { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.78rem; color: var(--subtext); }
+  .scoring-strip strong { color: var(--text); }
+  .scoring-strip .pill { background: #1e2d4a; border-radius: 6px; padding: 3px 8px; }
+
+  /* Leaderboard */
+  .leaderboard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .lb-header { display: grid; grid-template-columns: 44px 1fr 140px 80px; gap: 8px; padding: 10px 16px; background: #0f1929; font-size: 0.75rem; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lb-row { display: grid; grid-template-columns: 44px 1fr 140px 80px; gap: 8px; padding: 13px 16px; border-top: 1px solid var(--border); align-items: center; transition: background 0.1s; }
+  .lb-row:hover { background: #1a2540; }
+  .lb-rank { font-weight: 700; font-size: 1rem; text-align: center; }
+  .rank-1 { color: var(--gold); }
+  .rank-2 { color: var(--silver); }
+  .rank-3 { color: var(--bronze); }
+  .lb-bracket { font-weight: 600; font-size: 0.95rem; }
+  .lb-name { font-size: 0.78rem; color: var(--subtext); margin-top: 2px; }
+  .lb-champion { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+  .flag { font-size: 1rem; }
+  .eliminated-badge { font-size: 0.65rem; color: var(--red); font-weight: 600; background: #2d1515; border-radius: 4px; padding: 1px 5px; }
+  .lb-pts { font-size: 1.2rem; font-weight: 700; text-align: right; color: var(--accent); }
+  .lb-pts-detail { font-size: 0.7rem; color: var(--subtext); text-align: right; margin-top: 2px; }
+
+  /* Scores tab */
+  .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .group-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .group-card-header { background: #0f1929; padding: 10px 14px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; color: var(--accent); }
+  .group-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .group-table th { padding: 6px 10px; text-align: center; color: var(--subtext); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; background: #101828; }
+  .group-table th:first-child { text-align: left; }
+  .group-table td { padding: 8px 10px; text-align: center; border-top: 1px solid var(--border); }
+  .group-table td:first-child { text-align: left; font-weight: 500; }
+  .group-table tr.qualified td:first-child { border-left: 3px solid var(--green); }
+  .group-table tr.third-q td:first-child { border-left: 3px solid var(--gold); }
+  .live-dot { display: inline-block; width: 7px; height: 7px; background: var(--red); border-radius: 50%; margin-right: 5px; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .status-final { color: var(--green); font-size: 0.7rem; font-weight: 600; }
+  .status-live { color: var(--red); font-size: 0.7rem; font-weight: 600; }
+  .status-upcoming { color: var(--subtext); font-size: 0.7rem; }
+
+  /* Insights tab */
+  .insights-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .insight-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .insight-card h3 { font-size: 0.85rem; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+  .insight-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .insight-row:last-child { border-bottom: none; }
+  .insight-bar-wrap { flex: 1; margin: 0 12px; background: var(--border); border-radius: 4px; height: 5px; }
+  .insight-bar { height: 5px; border-radius: 4px; background: var(--accent); }
+  .insight-count { color: var(--subtext); font-size: 0.78rem; min-width: 24px; text-align: right; }
+
+  .data-warning { background: #2d1f00; border: 1px solid #7c4a00; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.83rem; color: #fbbf24; }
+  .data-warning strong { color: #f59e0b; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .spinner { text-align: center; padding: 60px; color: var(--subtext); }
+  .spinner::after { content: ''; display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .lb-header, .lb-row { grid-template-columns: 36px 1fr 100px 60px; }
+    .lb-pts { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>⚽ TSS World Cup <span>2026</span> · League Dashboard</h1>
+      <div style="margin-top:6px;font-size:0.78rem;color:var(--subtext)">
+        📍 Phase 1 of 2 · Group Stage &nbsp;·&nbsp;
+        Scores update every 2 min · <span id="lastUpdate" class="last-update">loading…</span>
+      </div>
+    </div>
+    <span class="phase-badge">GROUP STAGE LIVE</span>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showTab('leaderboard',this)">🏆 Leaderboard</button>
+    <button class="nav-btn" onclick="showTab('scores',this)">🥅 Scores &amp; Tables</button>
+    <button class="nav-btn" onclick="showTab('insights',this)">📊 League Insights</button>
+  </div>
+</nav>
+
+<main>
+
+  <div class="scoring-strip">
+    Points from:
+    <span class="pill">Group 1st <strong>3pts</strong></span>
+    <span class="pill">Group 2nd <strong>3pts</strong></span>
+    <span class="pill">Group 3rd <strong>2pts</strong></span>
+    <span class="pill">Group 4th <strong>1pt</strong></span>
+    <span class="pill">3rd advances <strong>2pts</strong></span>
+    <span class="pill">Champion <strong>15pts</strong></span>
+    <span class="pill">Golden Boot <strong>7pts</strong></span>
+  </div>
+
+  <!-- LEADERBOARD TAB -->
+  <div id="tab-leaderboard" class="tab-content active">
+    <div class="leaderboard">
+      <div class="lb-header">
+        <div>#</div>
+        <div>Bracket</div>
+        <div>Champion Pick</div>
+        <div style="text-align:right">Pts</div>
+      </div>
+      <div id="lb-rows"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- SCORES TAB -->
+  <div id="tab-scores" class="tab-content">
+    <div id="groups-container" class="groups-grid"><div class="spinner"></div></div>
+  </div>
+
+  <!-- INSIGHTS TAB -->
+  <div id="tab-insights" class="tab-content">
+    <div id="insights-container" class="insights-grid"><div class="spinner"></div></div>
+  </div>
+
+</main>
+
+<script>
+// ─── PLAYER PICKS (embedded from Jotform CSV) ────────────────────────────────
+const PLAYERS = [
+  { bracket:"Pardesia ye sachh hai piya", name:"Mayank Thapar", champion:"USA", boot:"Kylian Mbappe",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:3,"Bosnia-Herzegovina":4,Qatar:1,Switzerland:2}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:3,Australia:4,"Türkiye":2}, E:{Germany:1,"Curaçao":3,"Ivory Coast":2,Ecuador:4}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":2,"Saudi Arabia":4,Uruguay:3}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:2,Austria:3,Jordan:4}, K:{Portugal:1,"DR Congo":4,Uzbekistan:2,Colombia:3} }
+  },
+  { bracket:"Sam", name:"Samyak Bilala", champion:"Spain", boot:"Mbappe",
+    groups:{ A:{Mexico:3,"South Africa":4,"Korea Republic":2,Czechia:1}, B:{Canada:4,"Bosnia-Herzegovina":2,Qatar:1,Switzerland:3}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:2,Paraguay:4,Australia:1,"Türkiye":3}, E:{Germany:1,"Curaçao":3,"Ivory Coast":null,Ecuador:4}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":3,Uruguay:2}, I:{France:1,Senegal:4,Iraq:2,Norway:3}, J:{Argentina:1,Algeria:4,Austria:2,Jordan:3}, K:{Portugal:1,"DR Congo":4,Uzbekistan:3,Colombia:2} }
+  },
+  { bracket:"False9", name:"Aniket Sharma", champion:"Spain", boot:"Mbappe",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:2,"Bosnia-Herzegovina":3,Qatar:4,Switzerland:1}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:3,Australia:4,"Türkiye":2}, E:{Germany:1,"Curaçao":4,"Ivory Coast":2,Ecuador:3}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:3,Iran:2,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":3,Uruguay:2}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:3,Austria:2,Jordan:4}, K:{Portugal:1,"DR Congo":4,Uzbekistan:3,Colombia:2} }
+  },
+  { bracket:"Seskobois", name:"Yatin Luthra", champion:"Portugal", boot:"Mbappe",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:3,"Bosnia-Herzegovina":4,Qatar:2,Switzerland:1}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:4,Australia:3,"Türkiye":2}, E:{Germany:1,"Curaçao":4,"Ivory Coast":3,Ecuador:2}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:3,Iran:2,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":3,Uruguay:2}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:2,Austria:3,Jordan:4}, K:{Portugal:1,"DR Congo":3,Uzbekistan:4,Colombia:2} }
+  },
+  { bracket:"Karan", name:"Karan Manocha", champion:"Netherlands", boot:"Kane",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":3,Czechia:2}, B:{Canada:3,"Bosnia-Herzegovina":4,Qatar:2,Switzerland:1}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:3,Australia:2,"Türkiye":4}, E:{Germany:1,"Curaçao":4,"Ivory Coast":3,Ecuador:2}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":3,"Saudi Arabia":4,Uruguay:2}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:3,Austria:2,Jordan:4}, K:{Portugal:1,"DR Congo":3,Uzbekistan:4,Colombia:2} }
+  },
+  { bracket:"SC1802", name:"Shiv Chopra", champion:"France", boot:"Yamal",
+    groups:{ A:{Mexico:2,"South Africa":4,"Korea Republic":1,Czechia:3}, B:{Canada:4,"Bosnia-Herzegovina":2,Qatar:1,Switzerland:3}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:4,Australia:3,"Türkiye":2}, E:{Germany:1,"Curaçao":3,"Ivory Coast":4,Ecuador:2}, F:{Netherlands:2,Japan:3,Sweden:1,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":3,Uruguay:2}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:3,Austria:2,Jordan:4}, K:{Portugal:1,"DR Congo":4,Uzbekistan:3,Colombia:2} }
+  },
+  { bracket:"Hazard ahead", name:"Jagrit Sethi", champion:"Brazil", boot:"Kane",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:3,"Bosnia-Herzegovina":2,Qatar:4,Switzerland:1}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:2,Paraguay:3,Australia:4,"Türkiye":1}, E:{Germany:2,"Curaçao":4,"Ivory Coast":3,Ecuador:1}, F:{Netherlands:2,Japan:1,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:3,Iran:2,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":2,Uruguay:3}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:2,Austria:3,Jordan:4}, K:{Portugal:1,"DR Congo":4,Uzbekistan:3,Colombia:2} }
+  },
+  { bracket:"SHADOWFOX18", name:"Arun Chopra", champion:"Portugal", boot:"Harry Kane",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:3,"Bosnia-Herzegovina":2,Qatar:4,Switzerland:1}, C:{Brazil:2,Morocco:1,Haiti:4,Scotland:3}, D:{USA:2,Paraguay:4,Australia:3,"Türkiye":1}, E:{Germany:1,"Curaçao":4,"Ivory Coast":3,Ecuador:2}, F:{Netherlands:1,Japan:3,Sweden:2,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":4,"Saudi Arabia":3,Uruguay:2}, I:{France:1,Senegal:3,Iraq:4,Norway:2}, J:{Argentina:1,Algeria:3,Austria:2,Jordan:4}, K:{Portugal:1,"DR Congo":4,Uzbekistan:3,Colombia:2} }
+  },
+  { bracket:"Ousman demboba", name:"Priyank N", champion:"France", boot:"Mbappe",
+    groups:{ A:{Mexico:1,"South Africa":4,"Korea Republic":2,Czechia:3}, B:{Canada:2,"Bosnia-Herzegovina":3,Qatar:4,Switzerland:1}, C:{Brazil:1,Morocco:2,Haiti:4,Scotland:3}, D:{USA:1,Paraguay:4,Australia:3,"Türkiye":2}, E:{Germany:1,"Curaçao":4,"Ivory Coast":3,Ecuador:2}, F:{Netherlands:1,Japan:2,Sweden:3,Tunisia:4}, G:{Belgium:1,Egypt:2,Iran:3,"New Zealand":4}, H:{Spain:1,"Cape Verde":3,"Saudi Arabia":4,Uruguay:2}, I:{France:1,Senegal:2,Iraq:4,Norway:3}, J:{Argentina:1,Algeria:3,Austria:2,Jordan:4}, K:{Portugal:1,"DR Congo":3,Uzbekistan:4,Colombia:2} }
+  }
+];
+
+// ─── SCORING RULES ───────────────────────────────────────────────────────────
+const PTS = { 1:3, 2:3, 3:2, 4:1 };
+const CHAMPION_PTS = 15;
+const BOOT_PTS = 7;
+const THIRD_ADVANCE_PTS = 2;
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let results = null;
+let scorers = null;
+let overrides = null;
+
+// ─── FETCH DATA ──────────────────────────────────────────────────────────────
+async function fetchData() {
+  try {
+    const [r, s, o] = await Promise.all([
+      fetch('results.json?v=' + Date.now()).then(x => x.json()),
+      fetch('scorers.json?v=' + Date.now()).then(x => x.json()).catch(() => ({})),
+      fetch('overrides.json?v=' + Date.now()).then(x => x.json()).catch(() => ({}))
+    ]);
+    results = r; scorers = s; overrides = o;
+  } catch(e) {
+    results = { groups:{}, thirds:[], champion:null, boot:null };
+    scorers = {}; overrides = {};
+  }
+  document.getElementById('lastUpdate').textContent = 'updated ' + new Date().toLocaleTimeString();
+  renderAll();
+}
+
+// ─── SCORING ENGINE ──────────────────────────────────────────────────────────
+function scorePlayer(player) {
+  let pts = 0; let breakdown = [];
+  const actualGroups = (results && results.groups) ? results.groups : {};
+  const thirds = (overrides && overrides.thirds) ? overrides.thirds :
+                 (results && results.thirds) ? results.thirds : [];
+  const champion = (overrides && overrides.champion) ? overrides.champion :
+                   (results && results.champion) ? results.champion : null;
+  const boot = (overrides && overrides.boot) ? overrides.boot :
+               (results && results.boot) ? results.boot : null;
+
+  // Group stage scoring
+  for (const grp of 'ABCDEFGHIJK'.split('')) {
+    const actual = actualGroups[grp];
+    const picked = player.groups[grp];
+    if (!actual || !picked) continue;
+    let grpPts = 0;
+    for (const [team, pos] of Object.entries(picked)) {
+      if (picked[team] === null) continue;
+      const actualPos = actual[team];
+      if (actualPos === undefined) continue;
+      if (actualPos === pos) {
+        grpPts += PTS[pos] || 0;
+      }
+    }
+    pts += grpPts;
+    // 3rd place advance bonus
+    for (const [team, pos] of Object.entries(picked)) {
+      if (pos === 3 && thirds.includes(team)) {
+        pts += THIRD_ADVANCE_PTS;
+        breakdown.push(`+${THIRD_ADVANCE_PTS} ${team} advanced`);
+      }
+    }
+  }
+
+  // Champion
+  if (champion && player.champion && player.champion.toLowerCase() === champion.toLowerCase()) {
+    pts += CHAMPION_PTS;
+    breakdown.push(`+${CHAMPION_PTS} champion`);
+  }
+
+  // Boot — last name match
+  if (boot && player.boot) {
+    const bootLast = boot.split(' ').pop().toLowerCase();
+    const pickLast = player.boot.split(' ').pop().toLowerCase();
+    if (bootLast === pickLast) {
+      pts += BOOT_PTS;
+      breakdown.push(`+${BOOT_PTS} golden boot`);
+    }
+  }
+
+  return { pts, breakdown };
+}
+
+// ─── RENDER LEADERBOARD ──────────────────────────────────────────────────────
+function renderLeaderboard() {
+  const scored = PLAYERS.map(p => ({ ...p, ...scorePlayer(p) }))
+    .sort((a,b) => b.pts - a.pts);
+
+  const eliminated = (overrides && overrides.eliminated) ? overrides.eliminated : [];
+
+  let html = '';
+  scored.forEach((p, i) => {
+    const rank = i + 1;
+    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+    const isElim = eliminated.includes(p.champion);
+    html += `
+      <div class="lb-row">
+        <div class="lb-rank ${rankClass}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</div>
+        <div>
+          <div class="lb-bracket">${p.bracket}</div>
+          <div class="lb-name">${p.name}</div>
+        </div>
+        <div class="lb-champion">
+          <span>${p.champion}</span>
+          ${isElim ? '<span class="eliminated-badge">OUT</span>' : ''}
+        </div>
+        <div>
+          <div class="lb-pts">${p.pts}</div>
+
+        </div>
+      </div>`;
+  });
+  document.getElementById('lb-rows').innerHTML = html;
+}
+
+// ─── RENDER GROUP TABLES ─────────────────────────────────────────────────────
+function renderScores() {
+  const actualGroups = (results && results.groups) ? results.groups : {};
+  const thirds = (overrides && overrides.thirds) ? overrides.thirds :
+                 (results && results.thirds) ? results.thirds : [];
+  const groupDefs = {
+    A:['Mexico','South Africa','Korea Republic','Czechia'],
+    B:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],
+    C:['Brazil','Morocco','Haiti','Scotland'],
+    D:['USA','Paraguay','Australia','Türkiye'],
+    E:['Germany','Curaçao','Ivory Coast','Ecuador'],
+    F:['Netherlands','Japan','Sweden','Tunisia'],
+    G:['Belgium','Egypt','Iran','New Zealand'],
+    H:['Spain','Cape Verde','Saudi Arabia','Uruguay'],
+    I:['France','Senegal','Iraq','Norway'],
+    J:['Argentina','Algeria','Austria','Jordan'],
+    K:['Portugal','DR Congo','Uzbekistan','Colombia']
+  };
+
+  let html = '';
+  for (const [grp, teams] of Object.entries(groupDefs)) {
+    const actual = actualGroups[grp];
+    // Sort teams by actual standing if available, else alphabetical
+    const sorted = actual
+      ? [...teams].sort((a,b) => (actual[a]||99) - (actual[b]||99))
+      : teams;
+
+    html += `<div class="group-card">
+      <div class="group-card-header">GROUP ${grp}</div>
+      <table class="group-table">
+        <thead><tr><th>Team</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr></thead>
+        <tbody>`;
+
+    sorted.forEach((team, idx) => {
+      const standing = actual ? actual[team] : null;
+      const pos = standing || (idx + 1);
+      const rowClass = pos === 1 || pos === 2 ? 'qualified' : thirds.includes(team) ? 'third-q' : '';
+      const stats = (results && results.stats && results.stats[grp] && results.stats[grp][team]) || {};
+      html += `<tr class="${rowClass}">
+        <td>${team}</td>
+        <td>${stats.w ?? '–'}</td>
+        <td>${stats.d ?? '–'}</td>
+        <td>${stats.l ?? '–'}</td>
+        <td><strong>${stats.pts ?? '–'}</strong></td>
+      </tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+  }
+  document.getElementById('groups-container').innerHTML = html;
+}
+
+// ─── RENDER INSIGHTS ─────────────────────────────────────────────────────────
+function renderInsights() {
+  const total = PLAYERS.length;
+
+  // Champion picks
+  const champCounts = {};
+  PLAYERS.forEach(p => { champCounts[p.champion] = (champCounts[p.champion]||0)+1; });
+  const champSorted = Object.entries(champCounts).sort((a,b)=>b[1]-a[1]);
+
+  // Boot picks
+  const bootCounts = {};
+  PLAYERS.forEach(p => {
+    const name = p.boot.split(' ').pop();
+    bootCounts[name] = (bootCounts[name]||0)+1;
+  });
+  const bootSorted = Object.entries(bootCounts).sort((a,b)=>b[1]-a[1]);
+
+  // Most picked group winners
+  const winnerCounts = {};
+  PLAYERS.forEach(p => {
+    for (const [grp, picks] of Object.entries(p.groups)) {
+      if (!picks) continue;
+      for (const [team, pos] of Object.entries(picks)) {
+        if (pos === 1) winnerCounts[team] = (winnerCounts[team]||0)+1;
+      }
+    }
+  });
+  const winnerSorted = Object.entries(winnerCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  function barRows(entries, tot) {
+    return entries.map(([label, count]) => `
+      <div class="insight-row">
+        <span>${label}</span>
+        <div class="insight-bar-wrap"><div class="insight-bar" style="width:${Math.round(count/tot*100)}%"></div></div>
+        <span class="insight-count">${count}/${tot}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('insights-container').innerHTML = `
+    <div class="insight-card">
+      <h3>🏆 Champion Picks</h3>
+      ${barRows(champSorted, total)}
+    </div>
+    <div class="insight-card">
+      <h3>👟 Golden Boot Picks</h3>
+      ${barRows(bootSorted, total)}
+    </div>
+    <div class="insight-card">
+      <h3>🥇 Most Picked Group Winners</h3>
+      ${barRows(winnerSorted, total)}
+    </div>`;
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderAll() {
+  renderLeaderboard();
+  renderScores();
+  renderInsights();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+fetchData();
+setInterval(fetchData, 2 * 60 * 1000); // refresh every 2 min
+document.addEventListener('visibilitychange', () => { if (!document.hidden) fetchData(); });
+</script>
+</body>
+</html>
