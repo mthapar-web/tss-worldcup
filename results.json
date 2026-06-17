@@ -456,23 +456,23 @@
     "K": {
       "Portugal": {
         "w": 0,
-        "d": 0,
+        "d": 1,
         "l": 0,
-        "gf": 0,
-        "ga": 0,
+        "gf": 1,
+        "ga": 1,
         "gd": 0,
-        "pts": 0,
-        "gp": 0
+        "pts": 1,
+        "gp": 1
       },
       "DR Congo": {
         "w": 0,
-        "d": 0,
+        "d": 1,
         "l": 0,
-        "gf": 0,
-        "ga": 0,
+        "gf": 1,
+        "ga": 1,
         "gd": 0,
-        "pts": 0,
-        "gp": 0
+        "pts": 1,
+        "gp": 1
       },
       "Uzbekistan": {
         "w": 0,
@@ -499,5 +499,5 @@
   "thirds": [],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-17T13:03:20.712Z"
+  "updatedAt": "2026-06-17T20:38:38.432Z"
 }
