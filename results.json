@@ -477,27 +477,27 @@
       "Uzbekistan": {
         "w": 0,
         "d": 0,
-        "l": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
+        "l": 1,
+        "gf": 1,
+        "ga": 3,
+        "gd": -2,
         "pts": 0,
-        "gp": 0
+        "gp": 1
       },
       "Colombia": {
-        "w": 0,
+        "w": 1,
         "d": 0,
         "l": 0,
-        "gf": 0,
-        "ga": 0,
-        "gd": 0,
-        "pts": 0,
-        "gp": 0
+        "gf": 3,
+        "ga": 1,
+        "gd": 2,
+        "pts": 3,
+        "gp": 1
       }
     }
   },
   "thirds": [],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-17T20:38:38.432Z"
+  "updatedAt": "2026-06-18T11:40:32.584Z"
 }
