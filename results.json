@@ -46,13 +46,13 @@
       },
       "South Africa": {
         "w": 0,
-        "d": 0,
+        "d": 1,
         "l": 1,
-        "gf": 0,
-        "ga": 2,
+        "gf": 1,
+        "ga": 3,
         "gd": -2,
-        "pts": 0,
-        "gp": 1
+        "pts": 1,
+        "gp": 2
       },
       "Korea Republic": {
         "w": 1,
@@ -66,13 +66,13 @@
       },
       "Czechia": {
         "w": 0,
-        "d": 0,
+        "d": 1,
         "l": 1,
-        "gf": 1,
-        "ga": 2,
+        "gf": 2,
+        "ga": 3,
         "gd": -1,
-        "pts": 0,
-        "gp": 1
+        "pts": 1,
+        "gp": 2
       }
     },
     "B": {
@@ -499,5 +499,5 @@
   "thirds": [],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-18T11:40:32.584Z"
+  "updatedAt": "2026-06-18T20:01:27.802Z"
 }
