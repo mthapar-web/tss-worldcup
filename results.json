@@ -467,12 +467,12 @@
       "DR Congo": {
         "w": 0,
         "d": 1,
-        "l": 0,
+        "l": 1,
         "gf": 1,
-        "ga": 1,
-        "gd": 0,
+        "ga": 2,
+        "gd": -1,
         "pts": 1,
-        "gp": 1
+        "gp": 2
       },
       "Uzbekistan": {
         "w": 0,
@@ -485,19 +485,19 @@
         "gp": 2
       },
       "Colombia": {
-        "w": 1,
+        "w": 2,
         "d": 0,
         "l": 0,
-        "gf": 3,
+        "gf": 4,
         "ga": 1,
-        "gd": 2,
-        "pts": 3,
-        "gp": 1
+        "gd": 3,
+        "pts": 6,
+        "gp": 2
       }
     }
   },
   "thirds": [],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-23T22:05:50.606Z"
+  "updatedAt": "2026-06-24T10:28:31.811Z"
 }
