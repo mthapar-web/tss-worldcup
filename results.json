@@ -79,42 +79,42 @@
       "Canada": {
         "w": 1,
         "d": 1,
-        "l": 0,
-        "gf": 7,
-        "ga": 1,
-        "gd": 6,
+        "l": 1,
+        "gf": 8,
+        "ga": 3,
+        "gd": 5,
         "pts": 4,
-        "gp": 2
+        "gp": 3
       },
       "Bosnia-Herzegovina": {
-        "w": 0,
+        "w": 1,
         "d": 1,
         "l": 1,
-        "gf": 2,
-        "ga": 5,
-        "gd": -3,
-        "pts": 1,
-        "gp": 2
+        "gf": 5,
+        "ga": 6,
+        "gd": -1,
+        "pts": 4,
+        "gp": 3
       },
       "Qatar": {
         "w": 0,
         "d": 1,
-        "l": 1,
-        "gf": 1,
-        "ga": 7,
-        "gd": -6,
+        "l": 2,
+        "gf": 2,
+        "ga": 10,
+        "gd": -8,
         "pts": 1,
-        "gp": 2
+        "gp": 3
       },
       "Switzerland": {
-        "w": 1,
+        "w": 2,
         "d": 1,
         "l": 0,
-        "gf": 5,
-        "ga": 2,
-        "gd": 3,
-        "pts": 4,
-        "gp": 2
+        "gf": 7,
+        "ga": 3,
+        "gd": 4,
+        "pts": 7,
+        "gp": 3
       }
     },
     "C": {
@@ -496,8 +496,10 @@
       }
     }
   },
-  "thirds": [],
+  "thirds": [
+    "Bosnia-Herzegovina"
+  ],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-24T17:31:18.243Z"
+  "updatedAt": "2026-06-24T22:02:48.967Z"
 }
