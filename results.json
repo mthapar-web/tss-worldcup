@@ -205,42 +205,42 @@
       "Germany": {
         "w": 2,
         "d": 0,
-        "l": 0,
-        "gf": 9,
-        "ga": 2,
-        "gd": 7,
+        "l": 1,
+        "gf": 10,
+        "ga": 4,
+        "gd": 6,
         "pts": 6,
-        "gp": 2
+        "gp": 3
       },
       "Curaçao": {
         "w": 0,
         "d": 1,
-        "l": 1,
+        "l": 2,
         "gf": 1,
-        "ga": 7,
-        "gd": -6,
+        "ga": 9,
+        "gd": -8,
         "pts": 1,
-        "gp": 2
+        "gp": 3
       },
       "Ivory Coast": {
-        "w": 1,
+        "w": 2,
         "d": 0,
+        "l": 1,
+        "gf": 4,
+        "ga": 2,
+        "gd": 2,
+        "pts": 6,
+        "gp": 3
+      },
+      "Ecuador": {
+        "w": 1,
+        "d": 1,
         "l": 1,
         "gf": 2,
         "ga": 2,
         "gd": 0,
-        "pts": 3,
-        "gp": 2
-      },
-      "Ecuador": {
-        "w": 0,
-        "d": 1,
-        "l": 1,
-        "gf": 0,
-        "ga": 1,
-        "gd": -1,
-        "pts": 1,
-        "gp": 2
+        "pts": 4,
+        "gp": 3
       }
     },
     "F": {
@@ -497,11 +497,12 @@
     }
   },
   "thirds": [
+    "Ecuador",
     "Bosnia-Herzegovina",
     "Korea Republic",
     "Scotland"
   ],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-25T17:34:03.465Z"
+  "updatedAt": "2026-06-25T22:57:49.742Z"
 }
