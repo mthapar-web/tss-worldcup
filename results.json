@@ -371,44 +371,44 @@
     },
     "I": {
       "France": {
-        "w": 2,
+        "w": 3,
         "d": 0,
         "l": 0,
-        "gf": 6,
-        "ga": 1,
-        "gd": 5,
-        "pts": 6,
-        "gp": 2
+        "gf": 10,
+        "ga": 2,
+        "gd": 8,
+        "pts": 9,
+        "gp": 3
       },
       "Senegal": {
-        "w": 0,
+        "w": 1,
         "d": 0,
         "l": 2,
-        "gf": 3,
+        "gf": 8,
         "ga": 6,
-        "gd": -3,
-        "pts": 0,
-        "gp": 2
+        "gd": 2,
+        "pts": 3,
+        "gp": 3
       },
       "Iraq": {
         "w": 0,
         "d": 0,
-        "l": 2,
+        "l": 3,
         "gf": 1,
-        "ga": 7,
-        "gd": -6,
+        "ga": 12,
+        "gd": -11,
         "pts": 0,
-        "gp": 2
+        "gp": 3
       },
       "Norway": {
         "w": 2,
         "d": 0,
-        "l": 0,
-        "gf": 7,
-        "ga": 3,
-        "gd": 4,
+        "l": 1,
+        "gf": 8,
+        "ga": 7,
+        "gd": 1,
         "pts": 6,
-        "gp": 2
+        "gp": 3
       }
     },
     "J": {
@@ -501,10 +501,11 @@
     "Ecuador",
     "Bosnia-Herzegovina",
     "Paraguay",
+    "Senegal",
     "Korea Republic",
     "Scotland"
   ],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-26T17:17:55.573Z"
+  "updatedAt": "2026-06-26T21:50:17.663Z"
 }
