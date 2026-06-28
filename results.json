@@ -413,100 +413,100 @@
     },
     "J": {
       "Argentina": {
-        "w": 2,
+        "w": 3,
         "d": 0,
         "l": 0,
-        "gf": 5,
-        "ga": 0,
-        "gd": 5,
-        "pts": 6,
-        "gp": 2
+        "gf": 8,
+        "ga": 1,
+        "gd": 7,
+        "pts": 9,
+        "gp": 3
       },
       "Algeria": {
         "w": 1,
-        "d": 0,
+        "d": 1,
         "l": 1,
-        "gf": 2,
-        "ga": 4,
+        "gf": 5,
+        "ga": 7,
         "gd": -2,
-        "pts": 3,
-        "gp": 2
+        "pts": 4,
+        "gp": 3
       },
       "Austria": {
         "w": 1,
-        "d": 0,
+        "d": 1,
         "l": 1,
-        "gf": 3,
-        "ga": 3,
+        "gf": 6,
+        "ga": 6,
         "gd": 0,
-        "pts": 3,
-        "gp": 2
+        "pts": 4,
+        "gp": 3
       },
       "Jordan": {
         "w": 0,
         "d": 0,
-        "l": 2,
-        "gf": 2,
-        "ga": 5,
-        "gd": -3,
+        "l": 3,
+        "gf": 3,
+        "ga": 8,
+        "gd": -5,
         "pts": 0,
-        "gp": 2
+        "gp": 3
       }
     },
     "K": {
       "Portugal": {
         "w": 1,
-        "d": 1,
+        "d": 2,
         "l": 0,
         "gf": 6,
         "ga": 1,
         "gd": 5,
-        "pts": 4,
-        "gp": 2
+        "pts": 5,
+        "gp": 3
       },
       "DR Congo": {
-        "w": 0,
+        "w": 1,
         "d": 1,
         "l": 1,
-        "gf": 1,
-        "ga": 2,
-        "gd": -1,
-        "pts": 1,
-        "gp": 2
+        "gf": 4,
+        "ga": 3,
+        "gd": 1,
+        "pts": 4,
+        "gp": 3
       },
       "Uzbekistan": {
         "w": 0,
         "d": 0,
-        "l": 2,
-        "gf": 1,
-        "ga": 8,
-        "gd": -7,
+        "l": 3,
+        "gf": 2,
+        "ga": 11,
+        "gd": -9,
         "pts": 0,
-        "gp": 2
+        "gp": 3
       },
       "Colombia": {
         "w": 2,
-        "d": 0,
+        "d": 1,
         "l": 0,
         "gf": 4,
         "ga": 1,
         "gd": 3,
-        "pts": 6,
-        "gp": 2
+        "pts": 7,
+        "gp": 3
       }
     }
   },
   "thirds": [
+    "DR Congo",
     "Sweden",
     "Ecuador",
     "Bosnia-Herzegovina",
+    "Algeria",
     "Paraguay",
     "Senegal",
-    "Iran",
-    "Korea Republic",
-    "Scotland"
+    "Iran"
   ],
   "champion": null,
   "boot": null,
-  "updatedAt": "2026-06-28T00:15:31.919Z"
+  "updatedAt": "2026-06-28T10:15:44.855Z"
 }
